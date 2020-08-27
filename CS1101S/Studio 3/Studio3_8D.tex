@@ -1,0 +1,429 @@
+% !TEX options=--shell-escape
+\documentclass[10pt]{beamer}
+
+\newtheorem{thm}{Theorem}
+\usetheme[progressbar=frametitle]{metropolis}
+\usepackage{appendixnumberbeamer}
+
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+\usepackage{minted}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+\title{CS1101S - Programming Methodology I}
+\subtitle{Studio 3}
+% \date{\today}
+\date{}
+\author{Theodore Leebrant}
+\institute{Tutorial Group 8D}
+% \titlegraphic{\hfill%\includegraphics[height=1.5cm]{logo.pdf}}
+
+\begin{document}
+
+\maketitle
+
+\section[Admin Stuff]{Admininstrational Matters}
+
+\begin{frame}[fragile]{Attendance Taking}
+\begin{centering}
+\textbf{Make sure you have taken your temperature.} \\
+We will take photo when everyone is present. \\
+\end{centering}
+\end{frame}
+
+\section[Regarding SourceAcademy tasks]{SourceAcademy Task Briefing}
+
+\begin{frame}[fragile]{Paths}
+  \begin{itemize}
+    \item By now, you should have done 4 paths:
+    \begin{enumerate}
+      \item Elements of Programming (ungraded)
+      \item Runes (140XP)
+      \item Substitution model and recursion (140XP)
+      \item Orders of Growth (160XP)
+    \end{enumerate}
+    \item These will be autograded at a later time.
+    \item Paths are meant to assess your basic understanding of the topics taught in lectures and briefs. Please try to do them on time.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Mission}
+  \begin{itemize}
+    \item Most, if not all of you, have completed the Rune Reading Mission.
+    \item Some things to note:
+    \begin{itemize}
+      \item Read the comments 
+      \item Please make your code readable! This is for your future projects as well as my sanity in marking.
+      \item Read the Source styleguide. Some common mistakes include:
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Common mistakes}
+  \begin{itemize}
+    \item Put your comments for a function outside the function, not inside the function body. \href{https://share.sourceacademy.nus.edu.sg/functioncomments}{\underline{Example}}
+    \item For things other than functions, put the comments either on the line or after the line. \href{https://share.sourceacademy.nus.edu.sg/othercomments}{\underline{Example}}
+    \item Indentation style: try to stick to one tab (not two) - this one is more forgivable, but you might get some trouble when it got to longer code, because
+    \item You need to keep to 80 characters per line. \href{https://share.sourceacademy.nus.edu.sg/indentationonetab}{\underline{Example}}
+    \item Also check the styleguide for indentation, as there are quite a bit on it. 
+  \end{itemize}
+\end{frame}
+
+\section[Recap]{Recap}
+
+\begin{frame}[fragile]{Substitution Model}
+  \begin{itemize}
+    \item Reason about programs
+    \item Replace eligible sub-expression with result until you can't anymore (fully simplified/reduced) - some expressions are \textit{irreducible}.
+    \item By performing repeated reductions, we can simplify and find the result of any given statement.
+  \end{itemize}  
+\end{frame}
+
+\begin{frame}[fragile]{Applicative Order Reduction}
+  Works like your normal arithmetic: evaluate from the left, and the deepest expression.
+  \begin{itemize}
+    \item Evaluate arguments first.
+    \item Then substitute function call(s) with body.
+  \end{itemize}
+  Example:
+  \begin{minted}{js}      
+12345 % math_pow(10, math_floor(math_log10(12345)));
+  \end{minted}   
+  This will be evaluated as:
+  \begin{minted}{js}
+12345 % math_pow(10, math_floor(math_log10(12345)));
+12345 % math_pow(10, math_floor(4.09...));
+12345 % math_pow(10, 4);
+12345 % 10000;
+2345;
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Normal Order Reduction}
+  Do not evaluate arguments unless absolutely needed.
+  \begin{itemize}
+    \item Substitute function call(s) with body.
+    \item Then evaluate the arguments.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Normal Order Reduction (Example)}
+Example:
+  \begin{minted}{js}
+  function sq(x) { 
+      return x * x 
+  };
+  function dist(x, y) { 
+      return math_sqrt(sq(x) + sq(y)) 
+  };
+  dist(1 + 5, 2 * 10);
+  \end{minted}
+
+  This program will be executed as follows:
+  \begin{minted}{js}
+dist(1 + 5, 2 * 10);
+math_sqrt(sq(1 + 5) + sq(2 * 10))
+math_sqrt((1 + 5) * (1 + 5) + (2 * 10) * (2 * 10))
+math_sqrt((6) * (1 + 5) + (2 * 10) * (2 * 10))
+math_sqrt((6) * (6) + (2 * 10) * (2 * 10))
+...
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Applicative vs Normal Order Reduction}
+\begin{minted}{js}
+function p() {
+    return p();
+}
+
+function test(x, y) {
+    return x === 0 ? 0 : y;
+}
+
+test(0, p());
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive Problem-solving}
+  \begin{enumerate}
+    \item Base Case - the simplest problem you can think of
+    \item Think of one slightly simpler function call. Can you build the desired function call from this one?
+  \end{enumerate}
+  Example: Tower of Hanoi
+
+  The thing with recursion is belief! \\
+  You need to assume that the smaller problem is correct. \\
+  \textbf{Do not try to trace the recursion.}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive vs Iterative Processes}
+  \begin{itemize}
+    \item Both involve calling the function inside the function body (i.e. recursion)
+    \item A recursive process has \textbf{deferred operations}
+    \item An iterative process does not
+  \end{itemize}  
+    Example: \href{https://share.sourceacademy.nus.edu.sg/itervsrec}{\underline{https://share.sourceacademy.nus.edu.sg/itervsrec}} \\
+    (Use Stepper for visualisation)
+\end{frame}
+
+\begin{frame}[fragile]{Time Complexity}
+Why do we care?
+  \begin{itemize}
+    \item Need an abstract way to talk about resources consumed
+    \item The same for every languages, architecture, CPU
+    \item Some abstract measure of time taken for the program to run.
+    \item How do we characterize it?
+    \begin{itemize}
+      \item Number of operations performed.
+      \item Number of “simple” operations performed for some input size.
+      \item Simple operations:
+      \begin{itemize}
+        \item All arithmetic e.g. 4 * 5
+        \item Memory read and write e.g. const a = 4;
+        \item Conditionals e.g if (a === 4)
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}  
+\end{frame}
+
+\begin{frame}[fragile]{Space Complexity}
+Why do we care?
+  \begin{itemize}
+    \item We don't want to run out of space :(
+    \item Some abstract measure of space taken for the program to run is needed
+    \item Characterized by maximum number of symbols created at one point in time (usually deferred operator)
+  \end{itemize}
+\end{frame}
+
+\section[Studio Sheet (and Photo Taking)]{Studio Sheet}
+\begin{frame}[fragile]{Question 1}
+\begin{center}
+Someone try to answer :D \\
+\vspace{1em}
+\includegraphics[width = 0.5\textwidth]{img/q2.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Question 1}
+\begin{center}
+Intuitive solution: \\
+\vspace{1em}
+\includegraphics[width = 0.5\textwidth]{img/q2.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Question 2}
+\begin{center}
+The proper solution: \href{https://share.sourceacademy.nus.edu.sg/q1proper}{\underline{here}} \\
+\vspace{1em}
+\includegraphics[width = 0.5\textwidth]{img/q1.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Question 2}
+\begin{center}
+The intuitive solution: (on the board) \\
+\vspace{1em}
+\includegraphics[width = 0.5\textwidth]{img/q1.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Question 3}
+Take some time to think about the question, and someone try to explain.
+\end{frame}
+
+\begin{frame}[fragile]{Question 4}
+\begin{verbatim}
+    function power(b, n) {
+        return n === 0 ? 1 : b * power(b, n - 1);
+    }
+\end{verbatim}
+\begin{itemize}
+    \item Iterative or recursive process? Can you write it in the other manner?
+    \item Use the $\Theta$ notation to characterize the running time and space consumption of $power$ as the argument $n$ grows.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Question 4}
+Consider the following example: \texttt{power(2, 3)}
+\begin{minted}{js}
+    power(2, 3)
+    3 === 0 ? 1 : 2 * power(2, 2) // false
+    2 * power(2, 2)
+    2 * (2 === 0 ? 1 : 2 * power(2, 1)) // false
+    2 * (2 * power(2, 1))
+    2 * (2 * (1 === 0 ? 1 : 2 * power(2, 0))) // false
+    2 * (2 * (2 * (power(2, 0))))
+    2 * (2 * (2 * (0 === 0 ? 1 : power(2, -1)))) // true
+    2 * (2 * (2 * (1)))
+    2 * (2 * (2))
+    2 * (4)
+    8
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Question 5}
+Given that 
+\begin{equation*}
+b^n = 
+\begin{cases}
+  b^{n/2}b^{n/2} &\text{if }n\text{ is even} \\
+  b^{(n - 1)/2}b^{(n - 1)/2} &\text{if }n\text{ is even}
+\end{cases}
+\end{equation*}
+\begin{itemize}
+\item Implement a function $fast\_power(b, n)$ which computes $b^n$ in $O(log(n))$ time, where $n$ is a natural number. \href{https://share.sourceacademy.nus.edu.sg/fastpower}{[\underline{answer}]}\\
+
+\item Can you extend this to integer powers? \\
+
+\item Iterative or recursive process? Can you write it in the other manner?\\
+
+\item Use the $\Theta$ notation to characterize the running time and space consumption of $fast\_power$ as the argument $n$ grows.
+\end{itemize}
+
+\end{frame}
+
+\section[Additional Material]{Additional Material}
+
+\begin{frame}{Big-O, Big-$\Omega$, Big-$\Theta$}
+The intuitive definition of Big-O, Big-$\Omega$, Big-$\Theta$ are: \\
+When the input is big enough,
+\begin{table}
+\centering
+\begin{tabular}{|l|l|} 
+\hline
+$f(n) = O(g(n))$ & $f$ is bounded above by $g$  \\ 
+\hline
+$f(n) = \Omega(g(n))$       & $f $ is bounded below by $g$  \\ 
+\hline
+$f(n) = \Theta(g(n))$      & $f $ is bounded by $g$        \\
+\hline
+\end{tabular}
+\end{table}
+\centering
+\end{frame}
+
+\begin{frame}{Big-O, Big-$\Omega$, Big-$\Theta$}
+\begin{centering}
+\includegraphics[width = 0.5\textwidth]{img/bound.png} \\
+\end{centering}
+In this example, what is the relation between
+\begin{itemize}
+  \item $f$ and $g$
+  \item $f$ and $h$
+  \item $f$ and $k$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Big-O, Big-$\Omega$, Big-$\Theta$}
+\begin{figure}
+\includegraphics[width = 0.5\textwidth]{img/complexity.png}
+\caption{Graphs of commonly encountered time complexities}
+\centering
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Big-O, Big-$\Omega$, Big-$\Theta$}
+\textbf{Optional content - try if you like math, at this juncture.} \\
+What are the complexities of:
+\begin{itemize}
+\item $4n^2 - n$
+\item $5n^2 + n$
+\item $\sqrt{n} + n$
+\item $3^n n^2$
+\end{itemize}
+
+Verify the following:
+\begin{itemize}
+\item $log_5{n} = \Theta(\log{n})$
+\item $10n \log{n} = O(n^2)$
+\item $n^3 = O(2^n)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Big-O, Big-$\Omega$, Big-$\Theta$}
+\textbf{Optional content - try if you want some extra practice, at this juncture.} \\
+What is the (space and time) complexity of:
+\begin{minted}{js}
+function factorial(n) {
+    return n === 1
+        ? 1
+        : n * factorial(n - 1);
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Big-O, Big-$\Omega$, Big-$\Theta$}
+\textbf{Optional content - try if you want some extra practice, at this juncture.} \\
+What is the (space and time) complexity of:
+\begin{minted}{js}
+function helper(n, res) {
+    return n === 1
+        ? res
+        : helper(n - 1, n * res);
+}
+
+function factorial(n) {
+    return helper(n, 1);
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Big-O, Big-$\Omega$, Big-$\Theta$}
+\textbf{Optional content - try if you want some extra practice, at this juncture.} \\
+What is the (space and time) complexity of:
+\begin{minted}{js}
+function fizz(n) {
+    if (n === 0) {
+      return "done";
+    } else {
+        n % 3 === 0
+            ? display("fizz")
+            : n % 5 === 0
+                ? display("buzz")
+                : display(n);
+        return fizz(n - 1);
+    }
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Big-O, Big-$\Omega$, Big-$\Theta$}
+\textbf{Optional content - try if you want some extra practice, at this juncture.} \\
+Implement the following using both recursive and iterative processes:
+\begin{itemize}
+  \item Factorial
+  \item Fibonacci
+  \item Power
+  \item GCD
+  \item LCM
+  \item Coin-change problem (covered this week in lecture!)
+  \item ...(continued next slide)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Big-O, Big-$\Omega$, Big-$\Theta$}
+\textbf{Optional content - try if you want some extra practice, at this juncture.} \\
+Implement the following using both recursive and iterative processes:
+\begin{itemize}
+  \item Pascal triangle (covered this week in lecture!)
+  \item Tower of Hanoi
+  \item Permutations
+  \item Combinations
+  \item $sqrt(x)$ by Newton-Raphson method (or Newton's method)
+  \item sine approximation (see \href{https://source-academy.github.io/sicp/chapters/1.2.3.html}{\underline{the book}})
+\end{itemize}
+Some cannot be implemented using iterative. \\
+Analyze their space and time complexity. \\
+Are there any closed form for these questions?
+\end{frame}
+
+
+
+\end{document}
