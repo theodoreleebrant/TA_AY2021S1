@@ -1,0 +1,244 @@
+% !TEX options=--shell-escape
+\documentclass[10pt]{beamer}
+
+\newtheorem{thm}{Theorem}
+\usetheme[progressbar=frametitle]{metropolis}
+\usepackage{appendixnumberbeamer}
+
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+\usepackage{minted}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+\title{CS1101S - Programming Methodology I}
+\subtitle{Studio 4}
+% \date{\today}
+\date{}
+\author{Theodore Leebrant}
+\institute{Tutorial Group 8D}
+% \titlegraphic{\hfill%\includegraphics[height=1.5cm]{logo.pdf}}
+
+\begin{document}
+
+\maketitle
+
+\section[Admin Stuff]{Admininstrational Matters}
+
+\begin{frame}[fragile]{Attendance Taking}
+\begin{centering}
+\textbf{Make sure you have taken your temperature.} \\
+We will take photo when everyone is present. \\
+\end{centering}
+\end{frame}
+
+\begin{frame}[fragile]{Mastery Checks}
+\begin{centering}
+Mastery Check 1 is open. \\
+Please telegram me to set a schedule. \\
+Details are in the slides for Studio 2. \\
+\end{centering}
+\end{frame}
+
+\begin{frame}[fragile]{Events}
+\begin{itemize}
+  \item Contest \#1 - Closes 1st September
+  \item Reading Assessment - 4 September, 1030 (1000) - 1114
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{About the Reading Assessment}
+\begin{itemize}
+  \item LumiNUS Quiz
+  \item One sheet of A4 paper
+  \item Prepare zoom, recording app, matric card, pencil and eraser / pen
+  \item Practice questions available in LumiNUS
+\end{itemize}
+Question: do you want to go through the questions in past paper RA1? 
+\end{frame}
+
+\section[Recap]{Recap}
+
+\begin{frame}[fragile]{Anonymous functions / Lambda expression}
+  \begin{minted}{js}
+const f = param => param + 1;
+
+function f(param) {
+  return param + 1;
+}
+f(1);
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Function inside functions}
+  \begin{minted}{js}
+function factorial(n) {
+  function fact_helper(n, res) {
+    return n === 1
+      ? res
+      : fact_helper(n - 1, n * res);
+  }
+
+  return fact_helper(n, 1);
+}
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Higher order functions}
+  Having functions as arguments and / or returned value. \\
+  Non-programming example: integration / differentiation.
+\end{frame}
+
+\begin{frame}[fragile]{Higher order functions}
+  Say I want the smaller of two things:
+  \begin{minted}{js}
+const min = (a, b) => a < b ? a : b
+  \end{minted}
+  But what if I want to compare two times? (e.g. in hh:mm format)
+  \begin{minted}{js}
+const min = (f, a, b) => f(a) < f(b) ? a : b
+  \end{minted} 
+\end{frame}
+
+\begin{frame}[fragile]{Higher order functions}
+  Partial application of function:
+  \begin{minted}{js}
+const sum = a => b => a + b;
+const add_3 = sum(3);
+add_3(100);
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Scoping}
+  \begin{itemize}
+    \item We give names to things
+    \item We may give many things the same name
+    \item Which names refer to what? (we need context)
+  \end{itemize}  
+\end{frame}
+
+\begin{frame}[fragile]{Scoping}
+  \begin{itemize}
+    \item A name occurence refers to the closest surrounding declaration
+    \item Scope is the context where we find out names
+    \item Most common context: blocks \verb|{ ... }|
+    \item To find what a name refers to, look at the current scope, and then outwards. Take the first one you come across.
+    \item Names in an outer scope can be hidden by definitions in an inner scope.
+  \end{itemize}  
+\end{frame}
+
+\begin{frame}[fragile]{Scoping}
+\href{https://share.sourceacademy.nus.edu.sg/motherfuckingscopes}{\underline{What makes a scope?}}
+\end{frame}
+
+\begin{frame}[fragile]{Scoping}
+  \begin{minted}{js}
+const hello = "world";
+function n(hello) {
+    const g = hello => display;
+    g(hello)(hello);
+    return g(hello);
+}
+n("hello")(hello);
+  \end{minted}  
+\end{frame}
+
+\begin{frame}[fragile]{Scoping}
+  \begin{minted}{js}
+const n = 1;
+{
+    const n = 2;
+    {
+        const n = 3;
+        {
+            display(n);
+        }
+    }
+}
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Scoping}
+\begin{minted}{js}
+(f => x => f => x => f(x))
+    (x => x + 1)(3)(x => x)(x => 2 * x + 3)
+\end{minted}
+
+\begin{minted}{js}
+(a => a => a => a)(a => a)(a => a => a)(a => a => a)
+\end{minted}
+
+\begin{minted}{js}
+(x => y => z => y(z)) (x => y => x(y)) (y => z => z) (1);
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Example of HOF: series function}
+How to model a series $S(n) = \sum_{i=0}^n a_i x^n = a_0 x^0 + a_1 x^1 + \hdots$
+\begin{minted}{js}
+function series_generator(limit, coefficient) {
+    // body here
+}
+function factorial(n) {
+  return n * factorial(n - 1);
+}
+\end{minted}
+
+Given that $e^x = \sum_{i=0}^{\infty} \frac{x^i}{i!}$
+
+\begin{minted}{js}
+const exp_coeff = n => 1 / factorial(n);
+const exp_series = series_generator(10, exp_coefficient);
+exp_series(2);
+// Other way to call: series_generator(10, n => 1 / factorial(n))(2)
+\end{minted}
+\href{https://share.sourceacademy.nus.edu.sg/series}{\underline{Answer}} (contributed by Xiu Wen - T08D)
+\end{frame}
+
+
+\section[Studio Sheet (and Photo Taking)]{Studio Sheet}
+
+
+\section[Additional Material]{Additional Material}
+
+\begin{frame}[fragile]{Church Numerals - Functional Expressionism Quest}
+\begin{itemize}
+\item Peano arithmetic - how to describe the natural numbers
+\item A set of axioms / postulates: (here, $\mathbb{N}$ denotes the set of natural numbers)
+\begin{enumerate}
+  \item 0 is a natural number
+  \item $\forall x \in \mathbb{N}, x = x$ (equality is reflexive)
+  \item $\forall x, y \in \mathbb{N}, x = y \rightarrow y = x$ (equality is symmetric)
+  \item $\forall x, y, z \in \mathbb{N}, \Big(x=y \text{ and } y = z \Big) \Rightarrow x = z$ (equality is transitive)
+  \item $\forall a, b; \Big(b \in \mathbb{N} \text{ and } a = b \Big) \Rightarrow a \in \mathbb{N}$ (closure under equality)
+  \item $\forall n \in \mathbb{N}, S(n) \in \mathbb{N}$ where $S$ is the successor function (closure under $S$)
+  \item $\forall m, n \in \mathbb{N}, m = n \iff S(m) = S(n)$ ($S$ is an injection)
+  \item $\forall n \in \mathbb{N}, S(n) = 0$ is \textbf{false}. (No natural number whose successor is 0)
+  \item If $K$ is a set such that $0 \in K$ and $\forall n \in \mathbb{N}, n \in K \Rightarrow S(n) \in K$ (induction)
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Church Numerals - Functional Expressionism Quest}
+In lambda calculus, we can represent natural numbers too. \\
+We define 0 as \verb|f => x => x| \\
+1 is defined as \verb|f => x => f(x)| \\
+2 is defined as \verb|f => x => f(f(x))| \\
+... n is defined as \verb|f => x => f(f(f(...f(x)...)))| \\
+
+The successor function is defined as applying \texttt{f} one more time. \\
+In other words, \texttt{n => f => z => f(n(f)(z)); }
+\end{frame}
+
+\begin{frame}[fragile]{Church Numerals - Functional Expressionism Quest}
+How do we decrement stuff? [Predecessor function] \\
+Rules: pred(0) = 0 (can't go lower than that), otherwise pred(n) = m iff succ(m) = n. \\
+
+To implement: [try google, I'm too tired to make these slides]
+\end{frame}
+
+\end{document}
